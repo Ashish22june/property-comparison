@@ -2,14 +2,8 @@ import React from 'react';
 import { PropertyComparison } from './components';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import config from './config';
 
 function App() {
-  // Log config on mount
-  React.useEffect(() => {
-    config.logConfig();
-  }, []);
-
   return (
     <div className="App">
       <header className="app-header">
@@ -25,33 +19,20 @@ function App() {
                 <h1 className="app-title">
                   <i className="fas fa-chart-line"></i> Property Investment Analyzer
                 </h1>
-                <p className="app-subtitle">
-                  Compare and analyze property investments with detailed financial breakdowns
-                </p>
-                <div className="environment-badge">
-                  <span className="badge bg-info">v{config.version}</span>
-                  {config.isProduction() && <span className="badge bg-success ms-2">Production</span>}
-                  {config.isDevelopment() && <span className="badge bg-warning ms-2">Development</span>}
-                </div>
+                <p className="app-subtitle">Compare and analyze property investments with detailed financial breakdowns</p>
               </div>
             </div>
           </div>
         </div>
       </header>
-      
       <main className="app-main">
         <div className="container">
           <PropertyComparison />
         </div>
       </main>
-      
       <footer className="app-footer">
         <div className="container">
-          <p>© {new Date().getFullYear()} Property Investment Analyzer • v{config.version}</p>
-          <small className="text-muted">
-            {config.isProduction() ? 'Production Environment' : 'Development Environment'} • 
-            Currency: {config.currency}
-          </small>
+          <p>© {new Date().getFullYear()} Property Investment Analyzer. All rights reserved.</p>
         </div>
       </footer>
     </div>

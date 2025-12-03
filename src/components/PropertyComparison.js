@@ -114,6 +114,16 @@ const PropertyComparison = () => {
     return interestPaid;
   }, [calculateEMI]);
 
+  // NEW: Calculate Monthly IDC EMI
+  const calculateMonthlyIDCEMI = useCallback((homeLoanAmount, annualRate, constructionMonths) => {
+    if (!homeLoanAmount || homeLoanAmount === 0 || constructionMonths <= 0) return 0;
+    
+    const monthlyRate = annualRate / (12 * 100);
+    const monthlyIDC = homeLoanAmount * monthlyRate;
+    
+    return monthlyIDC;
+  }, []);
+
   const calculateFinancials = useCallback((propertySize, exitPrice, years, isScenario = false) => {
     const { purchasePrice, assumptions, paymentPlan } = propertyData;
     
@@ -151,6 +161,8 @@ const PropertyComparison = () => {
     const totalCashInvested = downPaymentAmount + personalLoan1Amount + personalLoan2Amount;
     
     let totalIDC = 0;
+    let monthlyIDCEMI = 0; // NEW: Monthly IDC EMI
+    
     if (paymentPlan === 'clp' && homeLoanAmount > 0) {
       const constructionEndMonth = assumptions.clpDurationYears * 12;
       const slabAmount = totalCost * 0.10;
@@ -171,6 +183,9 @@ const PropertyComparison = () => {
           totalIDC += interest;
         }
       });
+      
+      // NEW: Calculate Monthly IDC EMI
+      monthlyIDCEMI = calculateMonthlyIDCEMI(homeLoanAmount, assumptions.homeLoanRate, constructionEndMonth);
     }
     
     const totalHomeLoanAtCompletion = homeLoanAmount + totalIDC;
@@ -258,12 +273,12 @@ const PropertyComparison = () => {
     
     const roi = totalCashInvested > 0 ? (netGainLoss / totalCashInvested) * 100 : 0;
     
-    // NEW: Calculate monthly payment timelines
+    // NEW: Calculate monthly payment timelines with Monthly IDC EMI
     const prePossessionMonths = assumptions.possessionMonths;
     const postPossessionMonths = totalHoldingMonths - assumptions.possessionMonths;
     
-    // Pre-possession: PL1 EMI only
-    const prePossessionEMI = personalLoan1EMI;
+    // Pre-possession: PL1 EMI + Monthly IDC EMI
+    const prePossessionEMI = personalLoan1EMI + monthlyIDCEMI;
     const prePossessionTotal = prePossessionEMI * prePossessionMonths;
     
     // Post-possession: HL + PL1 + PL2 EMIs
@@ -292,6 +307,7 @@ const PropertyComparison = () => {
       
       totalInterestPaid,
       totalIDC,
+      monthlyIDCEMI, // NEW: Added monthly IDC EMI
       homeLoanInterestPaid,
       personalLoan1InterestPaid,
       personalLoan2InterestPaid,
@@ -334,15 +350,26 @@ const PropertyComparison = () => {
       
       totalHoldingMonths,
       
-      // NEW: Monthly payment timeline data
+      // Monthly payment timeline data
       prePossessionMonths,
       postPossessionMonths,
       prePossessionEMI,
       postPossessionEMI,
       prePossessionTotal,
-      postPossessionTotal
+      postPossessionTotal,
+      
+      // Detailed EMI breakdown for display
+      prePossessionComponents: {
+        pl1EMI: personalLoan1EMI,
+        monthlyIDCEMI: monthlyIDCEMI,
+        total: prePossessionEMI
+      },
+      
+      // Construction period data
+      constructionMonths: paymentPlan === 'clp' ? assumptions.clpDurationYears * 12 : 0,
+      hasIDC: totalIDC > 0
     };
-  }, [propertyData, calculateEMI, calculateOutstandingAfterPayments, calculateTotalInterestPaid]);
+  }, [propertyData, calculateEMI, calculateOutstandingAfterPayments, calculateTotalInterestPaid, calculateMonthlyIDCEMI]);
 
   const calculateStageWise = useCallback(() => {
     const propertySize = userSelections.selectedPropertySize;
@@ -1051,6 +1078,55 @@ const PropertyComparison = () => {
               </div>
             </div>
 
+            {/* CLP Specific Details */}
+            {propertyData.paymentPlan === 'clp' && (
+              <div className="mb-4">
+                <h5 className="fw-bold mb-3">
+                  <i className="bi bi-building me-2"></i>
+                  CLP Construction Details
+                </h5>
+                <div className="row g-3">
+                  <div className="col-md-4">
+                    <label className="form-label">Construction Duration (Years)</label>
+                    <input 
+                      type="number" 
+                      step="0.5"
+                      className="form-control"
+                      value={propertyData.assumptions.clpDurationYears}
+                      onChange={(e) => handleAssumptionChange('clpDurationYears', e.target.value)}
+                    />
+                    <small className="text-muted">Total construction period</small>
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">First Bank Disbursement (Month)</label>
+                    <input 
+                      type="number" 
+                      className="form-control"
+                      value={propertyData.assumptions.bankDisbursementStartMonth}
+                      onChange={(e) => handleAssumptionChange('bankDisbursementStartMonth', e.target.value)}
+                    />
+                    <small className="text-muted">Month when first disbursement occurs</small>
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Disbursement Interval (Months)</label>
+                    <input 
+                      type="number" 
+                      className="form-control"
+                      value={propertyData.assumptions.bankDisbursementInterval}
+                      onChange={(e) => handleAssumptionChange('bankDisbursementInterval', e.target.value)}
+                    />
+                    <small className="text-muted">Months between disbursements</small>
+                  </div>
+                </div>
+                <div className="alert alert-info mt-3">
+                  <small>
+                    <i className="bi bi-info-circle me-2"></i>
+                    In CLP plans, Interest During Construction (IDC) is calculated monthly and added to the Home Loan EMI calculation.
+                  </small>
+                </div>
+              </div>
+            )}
+
             {/* Exit Price Scenarios */}
             <div className="mb-4">
               <h5 className="fw-bold mb-3">
@@ -1298,7 +1374,7 @@ const PropertyComparison = () => {
         <div className="row g-4 mb-5">
           <div className="col-md-3">
             <div className="metric-card glass-card text-center">
-              <div className="p-3 rounded-circle bg-primary bg-opacity-10 d-inline-block mb-3">
+              <div className="p-3 rounded-circle bg-primary bg-opacity-20 d-inline-block mb-3">
                 <i className="bi bi-cash-stack text-primary fs-3"></i>
               </div>
               <h4 className="fw-bold mb-1">{formatLakhs(breakdown.totalCost)}</h4>
@@ -1307,7 +1383,7 @@ const PropertyComparison = () => {
           </div>
           <div className="col-md-3">
             <div className="metric-card glass-card text-center">
-              <div className="p-3 rounded-circle bg-success bg-opacity-10 d-inline-block mb-3">
+              <div className="p-3 rounded-circle bg-success bg-opacity-20 d-inline-block mb-3">
                 <i className="bi bi-percent text-success fs-3"></i>
               </div>
               <h4 className="fw-bold mb-1">{formatPercent(breakdown.roi)}</h4>
@@ -1316,7 +1392,7 @@ const PropertyComparison = () => {
           </div>
           <div className="col-md-3">
             <div className="metric-card glass-card text-center">
-              <div className="p-3 rounded-circle bg-warning bg-opacity-10 d-inline-block mb-3">
+              <div className="p-3 rounded-circle bg-warning bg-opacity-20 d-inline-block mb-3">
                 <i className="bi bi-graph-up-arrow text-warning fs-3"></i>
               </div>
               <h4 className="fw-bold mb-1">{formatLakhs(breakdown.leftoverCash)}</h4>
@@ -1325,7 +1401,7 @@ const PropertyComparison = () => {
           </div>
           <div className="col-md-3">
             <div className="metric-card glass-card text-center">
-              <div className="p-3 rounded-circle bg-info bg-opacity-10 d-inline-block mb-3">
+              <div className="p-3 rounded-circle bg-info bg-opacity-20 d-inline-block mb-3">
                 <i className="bi bi-calendar-check text-info fs-3"></i>
               </div>
               <h4 className="fw-bold mb-1">{breakdown.years}yrs</h4>
@@ -1336,7 +1412,7 @@ const PropertyComparison = () => {
 
         {/* Comparison Table - FIXED: Now uses calculatedData.profits which updates dynamically */}
         <div className="glass-card mb-5">
-          <div className="card-header bg-gradient-primary text-white">
+          <div className="card-header bg-gradient-primary text-black">
             <h5 className="mb-0">
               <i className="bi bi-table me-2"></i>
               Exit Price Comparison
@@ -1384,7 +1460,7 @@ const PropertyComparison = () => {
 
         {/* Payment Plan Summary - UPDATED: Smaller bars */}
         <div className="glass-card mb-5">
-          <div className="card-header bg-gradient-info text-white">
+          <div className="card-header bg-gradient-info text-black">
             <h5 className="mb-0">
               <i className="bi bi-pie-chart me-2"></i>
               Payment Plan Breakdown
@@ -1514,8 +1590,8 @@ const PropertyComparison = () => {
             >
               <i className="bi bi-pencil-square me-3 fs-5"></i>
               <div className="text-start">
-                <div className="fw-bold">Edit Parameters</div>
-                <small className="opacity-75">Modify inputs</small>
+                <div className="fw-bold text-white opacity-75">Edit Parameters</div>
+                <small className="text-white opacity-75">Modify inputs</small>
               </div>
             </button>
           </div>
@@ -1567,7 +1643,7 @@ const PropertyComparison = () => {
           </div>
           <div className="card-body">
             
-            {/* Monthly EMI Timeline Visualization */}
+            {/* Monthly EMI Timeline Visualization - UPDATED with Monthly IDC EMI */}
             <div className="row mb-4">
               <div className="col-12">
                 <h5 className="mb-3">
@@ -1575,7 +1651,7 @@ const PropertyComparison = () => {
                   Monthly EMI Timeline
                 </h5>
                 <div className="row g-3">
-                  {/* Timeline 1: Pre-Possession */}
+                  {/* Timeline 1: Pre-Possession - UPDATED with Monthly IDC EMI */}
                   <div className="col-md-6">
                     <div className="card h-100 border-primary">
                       <div className="card-header bg-primary text-white">
@@ -1583,6 +1659,9 @@ const PropertyComparison = () => {
                           <i className="bi bi-calendar-week me-2"></i>
                           Timeline 1: Pre-Possession
                         </h6>
+                        {breakdown.hasIDC && (
+                          <small className="opacity-75">Includes Monthly IDC EMI during construction</small>
+                        )}
                       </div>
                       <div className="card-body">
                         <div className="text-center mb-3">
@@ -1604,10 +1683,22 @@ const PropertyComparison = () => {
                           </div>
                           <div className="col-12">
                             <div className="p-2 bg-light rounded">
-                              <small className="text-muted">Components</small>
-                              <div className="fw-bold">
-                                PL1 EMI: {formatCurrency(breakdown.personalLoan1EMI)}
-                                {breakdown.totalIDC > 0 && ` + IDC: ${formatCurrency(breakdown.totalIDC)}`}
+                              <small className="text-muted">EMI Components</small>
+                              <div className="row g-1">
+                                <div className="col-6">
+                                  <div className="p-2 border rounded bg-white">
+                                    <small className="text-muted d-block">PL1 EMI</small>
+                                    <div className="fw-bold">{formatCurrency(breakdown.personalLoan1EMI)}</div>
+                                  </div>
+                                </div>
+                                {breakdown.hasIDC && breakdown.monthlyIDCEMI > 0 && (
+                                  <div className="col-6">
+                                    <div className="p-2 border rounded bg-warning bg-opacity-10">
+                                      <small className="text-muted d-block">Monthly IDC EMI</small>
+                                      <div className="fw-bold text-warning">{formatCurrency(breakdown.monthlyIDCEMI)}</div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1618,6 +1709,13 @@ const PropertyComparison = () => {
                               <small className="text-white">
                                 ({breakdown.prePossessionMonths} months × {formatCurrency(breakdown.prePossessionEMI)})
                               </small>
+                              {breakdown.hasIDC && (
+                                <div className="mt-2">
+                                  <small className="text-white opacity-75">
+                                    Includes {formatCurrency(breakdown.totalIDC)} total IDC over {breakdown.constructionMonths} months
+                                  </small>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1656,11 +1754,28 @@ const PropertyComparison = () => {
                           </div>
                           <div className="col-12">
                             <div className="p-2 bg-light rounded">
-                              <small className="text-muted">Components</small>
-                              <div className="fw-bold">
-                                HL EMI: {formatCurrency(breakdown.homeLoanEMI)} + 
-                                PL1 EMI: {formatCurrency(breakdown.personalLoan1EMI)} + 
-                                PL2 EMI: {formatCurrency(breakdown.personalLoan2EMI)}
+                              <small className="text-muted">EMI Components</small>
+                              <div className="row g-1">
+                                <div className="col-4">
+                                  <div className="p-2 border rounded bg-white">
+                                    <small className="text-muted d-block">HL EMI</small>
+                                    <div className="fw-bold">{formatCurrency(breakdown.homeLoanEMI)}</div>
+                                  </div>
+                                </div>
+                                <div className="col-4">
+                                  <div className="p-2 border rounded bg-white">
+                                    <small className="text-muted d-block">PL1 EMI</small>
+                                    <div className="fw-bold">{formatCurrency(breakdown.personalLoan1EMI)}</div>
+                                  </div>
+                                </div>
+                                {breakdown.hasPersonalLoan2 && (
+                                  <div className="col-4">
+                                    <div className="p-2 border rounded bg-white">
+                                      <small className="text-muted d-block">PL2 EMI</small>
+                                      <div className="fw-bold">{formatCurrency(breakdown.personalLoan2EMI)}</div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1687,6 +1802,14 @@ const PropertyComparison = () => {
                         <div>
                           <h6 className="mb-1">Total EMI Commitment</h6>
                           <small>Combined across both timelines</small>
+                          {breakdown.hasIDC && (
+                            <div className="mt-2">
+                              <small className="text-white opacity-75">
+                                <i className="bi bi-info-circle me-1"></i>
+                                Note: Monthly IDC EMI ({formatCurrency(breakdown.monthlyIDCEMI)}) is included in pre-possession calculation
+                              </small>
+                            </div>
+                          )}
                         </div>
                         <div className="text-end">
                           <div className="fw-bold fs-4">
@@ -1704,12 +1827,59 @@ const PropertyComparison = () => {
               </div>
             </div>
 
+            {/* Interest During Construction (IDC) Details */}
+            {breakdown.hasIDC && (
+              <div className="row mb-4">
+                <div className="col-12">
+                  <h5 className="mb-3">
+                    <i className="bi bi-calculator text-warning me-2"></i>
+                    Interest During Construction (IDC) Details
+                  </h5>
+                  <div className="row g-3">
+                    <div className="col-md-4">
+                      <div className="p-3 bg-warning text-white rounded text-center">
+                        <small className="text-white">Monthly IDC EMI</small>
+                        <div className="fw-bold fs-4">{formatCurrency(breakdown.monthlyIDCEMI)}</div>
+                        <small className="text-white">Monthly interest payment during construction</small>
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="p-3 bg-danger text-white rounded text-center">
+                        <small className="text-white">Total IDC Amount</small>
+                        <div className="fw-bold fs-4">{formatCurrency(breakdown.totalIDC)}</div>
+                        <small className="text-white">Accumulated over {breakdown.constructionMonths} months</small>
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="p-3 bg-info text-white rounded text-center">
+                        <small className="text-white">Home Loan with IDC</small>
+                        <div className="fw-bold fs-4">{formatCurrency(breakdown.totalHomeLoanAtCompletion)}</div>
+                        <small className="text-white">
+                          Principal: {formatCurrency(breakdown.homeLoanAmount)} + IDC: {formatCurrency(breakdown.totalIDC)}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="alert alert-info mt-3">
+                    <small>
+                      <i className="bi bi-info-circle me-2"></i>
+                      Monthly IDC EMI is calculated as: Home Loan Amount × (Home Loan Rate / 12). This interest accrues 
+                      monthly during the construction period and is added to the home loan principal.
+                    </small>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Home Loan Detailed Analysis */}
             <div className="row mb-4">
               <div className="col-12">
                 <h5 className="mb-3">
                   <i className="bi bi-bank text-primary me-2"></i>
                   Home Loan Analysis
+                  {breakdown.hasIDC && (
+                    <span className="badge bg-warning ms-2">Includes IDC</span>
+                  )}
                 </h5>
                 <div className="row g-3">
                   <div className="col-md-3">
@@ -1931,9 +2101,17 @@ const PropertyComparison = () => {
                         {formatLakhs(breakdown.totalInterestPaid)}
                       </h3>
                       <small>Total Interest Paid ({breakdown.years} years)</small>
+                      {breakdown.hasIDC && (
+                        <div className="mt-2">
+                          <small className="text-white opacity-75">
+                            <i className="bi bi-calculator me-1"></i>
+                            Includes {formatLakhs(breakdown.totalIDC)} IDC
+                          </small>
+                        </div>
+                      )}
                     </div>
                     <div className="text-end">
-                      {breakdown.totalIDC > 0 && (
+                      {breakdown.hasIDC && (
                         <div className="badge bg-white text-dark">IDC: {formatLakhs(breakdown.totalIDC)}</div>
                       )}
                     </div>
