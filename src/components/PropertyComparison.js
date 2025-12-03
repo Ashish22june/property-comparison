@@ -1,57 +1,57 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './PropertyComparison.css';
 
-// ===================== STATE =====================
 const PropertyComparison = () => {
+  // ===================== STATE =====================
   const [propertyData, setPropertyData] = useState({
-    purchasePrice: '', // Empty instead of 4400
-    exitPrices: [''], // Empty array
+    purchasePrice: 4400,
+    exitPrices: [6000, 7000, 8000],
     properties: [
       {
         id: 1,
-        size: '', // Empty
-        name: '', // Empty
-        location: '', // Empty
+        size: 1428,
+        name: 'Premium Penthouse',
+        location: 'Waterfront',
         rating: 4.8,
         isHighlighted: true,
-        possessionMonths: '' // Empty
+        possessionMonths: 24
       }
     ],
     paymentPlan: 'clp',
     assumptions: {
-      homeLoanRate: '', // Empty
-      homeLoanTerm: '', // Empty
-      homeLoanStartMonth: '', // Empty
+      homeLoanRate: 8,
+      homeLoanTerm: 20,
+      homeLoanStartMonth: 25,
       
-      personalLoan1Rate: '', // Empty
-      personalLoan1Term: '', // Empty
-      personalLoan1StartMonth: '', // Empty
-      personalLoan1Share: '', // Empty
+      personalLoan1Rate: 11,
+      personalLoan1Term: 7,
+      personalLoan1StartMonth: 0,
+      personalLoan1Share: 10,
       
-      personalLoan2Rate: '', // Empty
-      personalLoan2Term: '', // Empty
-      personalLoan2StartMonth: '', // Empty
-      personalLoan2Share: '', // Empty
+      personalLoan2Rate: 11,
+      personalLoan2Term: 7,
+      personalLoan2StartMonth: 30,
+      personalLoan2Share: 10,
       
-      downPaymentShare: '', // Empty
+      downPaymentShare: 0,
       
-      investmentPeriod: '', // Empty
-      clpDurationYears: '', // Empty
-      bankDisbursementStartMonth: '', // Empty
-      bankDisbursementInterval: '', // Empty
+      investmentPeriod: 3,
+      clpDurationYears: 2.5,
+      bankDisbursementStartMonth: 3,
+      bankDisbursementInterval: 3,
       
-      possessionMonths: '' // Empty
+      possessionMonths: 24
     }
   });
 
   const [userSelections, setUserSelections] = useState({
     selectedPropertyId: 1,
-    selectedExitPrice: '', // Empty
-    selectedYears: '', // Empty
-    selectedPropertySize: '', // Empty
-    scenarioSize: '', // Empty
-    scenarioExitPrice: '', // Empty
-    scenarioExitPrices: [''] // Empty
+    selectedExitPrice: 6000,
+    selectedYears: 3,
+    selectedPropertySize: 1428,
+    scenarioSize: 1428,
+    scenarioExitPrice: 6000,
+    scenarioExitPrices: [6000, 7000, 8000]
   });
 
   const [calculatedData, setCalculatedData] = useState({
@@ -642,174 +642,148 @@ const PropertyComparison = () => {
           </div>
           <div className="card-body">
             <div className="alert alert-info glass-card mb-4">
-  <div className="d-flex align-items-center">
-    <i className="bi bi-info-circle-fill fs-4 text-primary me-3"></i>
-    <div>
-      <h6 className="mb-1">How to use this tool:</h6>
-      <p className="mb-0 small">Enter property details and assumptions below. All fields are empty - you need to fill them. See examples below each field.</p>
-    </div>
-  </div>
-</div>
-
-{/* ADD THIS EXAMPLE CARD SECTION RIGHT HERE 👇 */}
-<div className="example-card mb-4">
-  <div className="example-title">
-    <i className="bi bi-lightbulb me-2"></i>
-    Quick Examples
-  </div>
-  <div className="example-text">
-    <strong>Example 1:</strong> 2 BHK in Noida, 1200 sq.ft, ₹5000/sq.ft, 8.5% home loan, 3 years holding
-  </div>
-  <div className="example-text mt-2">
-    <strong>Example 2:</strong> 3 BHK in Gurgaon, 1800 sq.ft, ₹7500/sq.ft, 9% home loan, 5 years holding
-  </div>
-  <div className="example-text mt-2">
-    <strong>Example 3 (CLP):</strong> Premium Apartment, 1500 sq.ft, ₹6000/sq.ft, 80% HL + 10% PL1 + 10% PL2, 24 months possession
-  </div>
-</div>
-
-{/* Then continue with Property Management section 👇 */}
-<div className="mb-4">
-  <h5 className="fw-bold mb-3">
-    <i className="bi bi-building me-2"></i>
-    Property Management
-  </h5>
-  
-  <div className="d-flex justify-content-between align-items-center mb-3">
-    <h6 className="mb-0">Properties ({propertyData.properties.length})</h6>
-    <button 
-      className="btn btn-success btn-sm"
-      onClick={handleAddProperty}
-    >
-      <i className="bi bi-plus-circle me-1"></i>
-      Add Property
-    </button>
-  </div>
-  
-  <div className="row g-3">
-    {propertyData.properties.map((property, index) => (
-      <div key={property.id} className="col-md-6 col-lg-4">
-        <div className="card h-100">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <span className="badge bg-primary">Property #{property.id}</span>
-            {propertyData.properties.length > 1 && (
-              <button 
-                className="btn btn-danger btn-sm"
-                onClick={() => handleRemoveProperty(property.id)}
-              >
-                <i className="bi bi-trash"></i>
-              </button>
-            )}
-          </div>
-          <div className="card-body">
-            <div className="mb-3">
-              <label className="form-label small">Property Name</label>
-              <input 
-                type="text" 
-                className="form-control form-control-sm"
-                value={property.name}
-                placeholder="e.g., 2 BHK with Study"
-                onChange={(e) => {
-                  const newProperties = [...propertyData.properties];
-                  newProperties[index].name = e.target.value;
-                  setPropertyData(prev => ({ ...prev, properties: newProperties }));
-                }}
-              />
-              <small className="text-muted">Example: Premium Penthouse, 3 BHK Flat</small>
+              <div className="d-flex align-items-center">
+                <i className="bi bi-info-circle-fill fs-4 text-primary me-3"></i>
+                <div>
+                  <h6 className="mb-1">How to use this tool:</h6>
+                  <p className="mb-0 small">Enter property details and assumptions below. Calculations update in real-time.</p>
+                </div>
+              </div>
             </div>
-            <div className="mb-3">
-              <label className="form-label small">Property Size (sq.ft)</label>
-              <input 
-                type="number" 
-                className="form-control form-control-sm"
-                value={property.size}
-                placeholder="e.g., 1200"
-                onChange={(e) => {
-                  const newProperties = [...propertyData.properties];
-                  newProperties[index].size = parseFloat(e.target.value) || '';
-                  setPropertyData(prev => ({ ...prev, properties: newProperties }));
-                }}
-              />
-              <small className="text-muted">Example: 1200, 1500, 2000</small>
+            
+            {/* Property Management */}
+            <div className="mb-4">
+              <h5 className="fw-bold mb-3">
+                <i className="bi bi-building me-2"></i>
+                Property Management
+              </h5>
+              
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="mb-0">Properties ({propertyData.properties.length})</h6>
+                <button 
+                  className="btn btn-success btn-sm"
+                  onClick={handleAddProperty}
+                >
+                  <i className="bi bi-plus-circle me-1"></i>
+                  Add Property
+                </button>
+              </div>
+              
+              <div className="row g-3">
+                {propertyData.properties.map((property, index) => (
+                  <div key={property.id} className="col-md-6 col-lg-4">
+                    <div className="card h-100">
+                      <div className="card-header d-flex justify-content-between align-items-center">
+                        <span className="badge bg-primary">Property #{property.id}</span>
+                        {propertyData.properties.length > 1 && (
+                          <button 
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleRemoveProperty(property.id)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        )}
+                      </div>
+                      <div className="card-body">
+                        <div className="mb-3">
+                          <label className="form-label small">Property Name</label>
+                          <input 
+                            type="text" 
+                            className="form-control form-control-sm"
+                            value={property.name}
+                            onChange={(e) => {
+                              const newProperties = [...propertyData.properties];
+                              newProperties[index].name = e.target.value;
+                              setPropertyData(prev => ({ ...prev, properties: newProperties }));
+                            }}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label small">Property Size (sq.ft)</label>
+                          <input 
+                            type="number" 
+                            className="form-control form-control-sm"
+                            value={property.size}
+                            onChange={(e) => {
+                              const newProperties = [...propertyData.properties];
+                              newProperties[index].size = parseFloat(e.target.value);
+                              setPropertyData(prev => ({ ...prev, properties: newProperties }));
+                            }}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label small">Location</label>
+                          <input 
+                            type="text" 
+                            className="form-control form-control-sm"
+                            value={property.location}
+                            onChange={(e) => {
+                              const newProperties = [...propertyData.properties];
+                              newProperties[index].location = e.target.value;
+                              setPropertyData(prev => ({ ...prev, properties: newProperties }));
+                            }}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label small">Estimated Possession (Months)</label>
+                          <input 
+                            type="number" 
+                            className="form-control form-control-sm"
+                            value={property.possessionMonths}
+                            onChange={(e) => {
+                              const newProperties = [...propertyData.properties];
+                              newProperties[index].possessionMonths = parseFloat(e.target.value);
+                              setPropertyData(prev => ({ ...prev, properties: newProperties }));
+                            }}
+                          />
+                          <small className="text-muted">Months until property possession</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mb-3">
-              <label className="form-label small">Location</label>
-              <input 
-                type="text" 
-                className="form-control form-control-sm"
-                value={property.location}
-                placeholder="e.g., Noida Sector 150"
-                onChange={(e) => {
-                  const newProperties = [...propertyData.properties];
-                  newProperties[index].location = e.target.value;
-                  setPropertyData(prev => ({ ...prev, properties: newProperties }));
-                }}
-              />
-              <small className="text-muted">Example: Noida, Gurgaon, Bangalore</small>
-            </div>
-            <div className="mb-3">
-              <label className="form-label small">Estimated Possession (Months)</label>
-              <input 
-                type="number" 
-                className="form-control form-control-sm"
-                value={property.possessionMonths}
-                placeholder="e.g., 24"
-                onChange={(e) => {
-                  const newProperties = [...propertyData.properties];
-                  newProperties[index].possessionMonths = parseFloat(e.target.value) || '';
-                  setPropertyData(prev => ({ ...prev, properties: newProperties }));
-                }}
-              />
-              <small className="text-muted">Months until property possession</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
 
             {/* Property Basic Information */}
-<div className="mb-4">
-  <h5 className="fw-bold mb-3">
-    <i className="bi bi-info-circle me-2"></i>
-    Common Property Information
-  </h5>
-  <div className="row g-3">
-    <div className="col-md-6">
-      <label className="form-label">Purchase Price (₹/sq.ft)</label>
-      <input 
-        type="number" 
-        className="form-control"
-        value={propertyData.purchasePrice}
-        placeholder="e.g., 5000"
-        onChange={(e) => handleInputChange('purchasePrice', parseFloat(e.target.value) || '')}
-      />
-      <small className="text-muted">Example: 5000, 7500, 10000</small>
-    </div>
-    <div className="col-md-6">
-      <label className="form-label">Select Property for Analysis</label>
-      <select 
-        className="form-select"
-        value={userSelections.selectedPropertyId}
-        onChange={(e) => {
-          const propId = parseInt(e.target.value);
-          handleSelectionUpdate('selectedPropertyId', propId);
-          const selectedProp = propertyData.properties.find(p => p.id === propId);
-          if (selectedProp) {
-            handleSelectionUpdate('selectedPropertySize', selectedProp.size || '');
-          }
-        }}
-      >
-        {propertyData.properties.map(property => (
-          <option key={property.id} value={property.id}>
-            {property.name ? `${property.name} (${property.size || '?'} sq.ft)` : `Property ${property.id}`}
-          </option>
-        ))}
-      </select>
-    </div>
-  </div>
-</div>
+            <div className="mb-4">
+              <h5 className="fw-bold mb-3">
+                <i className="bi bi-info-circle me-2"></i>
+                Common Property Information
+              </h5>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label">Purchase Price (₹/sq.ft)</label>
+                  <input 
+                    type="number" 
+                    className="form-control"
+                    value={propertyData.purchasePrice}
+                    onChange={(e) => handleInputChange('purchasePrice', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Select Property for Analysis</label>
+                  <select 
+                    className="form-select"
+                    value={userSelections.selectedPropertyId}
+                    onChange={(e) => {
+                      const propId = parseInt(e.target.value);
+                      handleSelectionUpdate('selectedPropertyId', propId);
+                      const selectedProp = propertyData.properties.find(p => p.id === propId);
+                      if (selectedProp) {
+                        handleSelectionUpdate('selectedPropertySize', selectedProp.size);
+                      }
+                    }}
+                  >
+                    {propertyData.properties.map(property => (
+                      <option key={property.id} value={property.id}>
+                        {property.name} ({property.size} sq.ft)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
 
             {/* Payment Plan Selection */}
             <div className="mb-4">
@@ -839,7 +813,6 @@ const PropertyComparison = () => {
                     value={propertyData.assumptions.investmentPeriod}
                     onChange={(e) => handleAssumptionChange('investmentPeriod', e.target.value)}
                   />
-                   <small className="text-muted">Example: 3 years, 5 years, 7 years</small>
                 </div>
               </div>
 
@@ -914,19 +887,18 @@ const PropertyComparison = () => {
               </h5>
               <div className="row g-3">
                 <div className="col-md-6">
-  <label className="form-label">Estimated Possession After (Months)</label>
-  <div className="input-group">
-    <input 
-      type="number" 
-      className="form-control"
-      value={propertyData.assumptions.possessionMonths}
-      placeholder="e.g., 24"
-      onChange={(e) => handleAssumptionChange('possessionMonths', e.target.value)}
-    />
-    <span className="input-group-text">months</span>
-  </div>
-  <small className="text-muted">Example: 24 months (2 years), 36 months (3 years)</small>
-</div>
+                  <label className="form-label">Estimated Possession After (Months)</label>
+                  <div className="input-group">
+                    <input 
+                      type="number" 
+                      className="form-control"
+                      value={propertyData.assumptions.possessionMonths}
+                      onChange={(e) => handleAssumptionChange('possessionMonths', e.target.value)}
+                    />
+                    <span className="input-group-text">months</span>
+                  </div>
+                  <small className="text-muted">Time until you get possession of the property</small>
+                </div>
                 <div className="col-md-6">
                   <div className="p-3 bg-light rounded">
                     <small className="text-muted">Impact on Loans</small>
@@ -941,125 +913,118 @@ const PropertyComparison = () => {
 
             {/* Home Loan Information */}
             <div className="mb-4">
-  <h5 className="fw-bold mb-3">
-    <i className="bi bi-bank me-2"></i>
-    Home Loan Details
-  </h5>
-  <div className="row g-3">
-    <div className="col-md-3">
-      <label className="form-label">Home Loan Rate (%)</label>
-      <input 
-        type="number" 
-        step="0.1"
-        className="form-control"
-        value={propertyData.assumptions.homeLoanRate}
-        placeholder="e.g., 8.5"
-        onChange={(e) => handleAssumptionChange('homeLoanRate', e.target.value)}
-      />
-      <small className="text-muted">Example: 8.0%, 8.5%, 9.0%</small>
-    </div>
-    <div className="col-md-3">
-      <label className="form-label">
-        Start After Possession
-      </label>
-      <input 
-        type="range" 
-        className="form-range"
-        min="0"
-        max="240"
-        value={propertyData.assumptions.homeLoanStartMonth || 0}
-        onChange={(e) => handleAssumptionChange('homeLoanStartMonth', e.target.value)}
-      />
-      <div className="d-flex justify-content-between">
-        <small>Month 0</small>
-        <small>240 months</small>
-      </div>
-      <small className="text-muted">Default: Same as possession month</small>
-    </div>
-    <div className="col-md-3">
-      <label className="form-label">Loan Term (Years)</label>
-      <input 
-        type="number" 
-        className="form-control"
-        value={propertyData.assumptions.homeLoanTerm}
-        placeholder="e.g., 20"
-        onChange={(e) => handleAssumptionChange('homeLoanTerm', e.target.value)}
-      />
-      <small className="text-muted">Example: 15 years, 20 years, 25 years</small>
-    </div>
-    <div className="col-md-3">
-      <div className="p-3 bg-light rounded h-100">
-        <small className="text-muted">Actual EMI Start</small>
-        <div className="fw-bold">
-          Month {Math.max(propertyData.assumptions.homeLoanStartMonth || 0, propertyData.assumptions.possessionMonths || 0)}
-        </div>
-        <small className="text-muted">After possession delay</small>
-      </div>
-    </div>
-  </div>
-</div>
+              <h5 className="fw-bold mb-3">
+                <i className="bi bi-bank me-2"></i>
+                Home Loan Details
+              </h5>
+              <div className="row g-3">
+                <div className="col-md-3">
+                  <label className="form-label">Home Loan Rate (%)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    className="form-control"
+                    value={propertyData.assumptions.homeLoanRate}
+                    onChange={(e) => handleAssumptionChange('homeLoanRate', e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">
+                    Start After Possession (Current: {propertyData.assumptions.homeLoanStartMonth} months)
+                    <br />
+                    <small className="text-muted">Selected: {propertyData.assumptions.homeLoanStartMonth} months</small>
+                  </label>
+                  <input 
+                    type="range" 
+                    className="form-range"
+                    min="0"
+                    max="240"
+                    value={propertyData.assumptions.homeLoanStartMonth}
+                    onChange={(e) => handleAssumptionChange('homeLoanStartMonth', e.target.value)}
+                  />
+                  <div className="d-flex justify-content-between">
+                    <small>Month 0</small>
+                    <small>240 months</small>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">Loan Term (Years)</label>
+                  <input 
+                    type="number" 
+                    className="form-control"
+                    value={propertyData.assumptions.homeLoanTerm}
+                    onChange={(e) => handleAssumptionChange('homeLoanTerm', e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <div className="p-3 bg-light rounded h-100">
+                    <small className="text-muted">Actual EMI Start</small>
+                    <div className="fw-bold">
+                      Month {Math.max(propertyData.assumptions.homeLoanStartMonth, propertyData.assumptions.possessionMonths)}
+                    </div>
+                    <small className="text-muted">After possession delay</small>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Personal Loan 1 Information */}
             <div className="mb-4">
-  <h5 className="fw-bold mb-3">
-    <i className="bi bi-cash-coin me-2"></i>
-    Personal Loan 1 Details
-  </h5>
-  <div className="row g-3">
-    <div className="col-md-3">
-      <label className="form-label">Share of Total Cost (%)</label>
-      <input 
-        type="number" 
-        className="form-control"
-        value={propertyData.assumptions.personalLoan1Share}
-        placeholder="e.g., 10"
-        onChange={(e) => handleAssumptionChange('personalLoan1Share', e.target.value)}
-        disabled={propertyData.paymentPlan !== 'custom'}
-      />
-      {propertyData.paymentPlan !== 'custom' && (
-        <small className="text-muted">Set by payment plan</small>
-      )}
-    </div>
-    <div className="col-md-3">
-      <label className="form-label">Amount</label>
-      <div className="form-control bg-light">
-        {propertyData.properties[0]?.size && propertyData.purchasePrice ? 
-          formatCurrency(propertyData.properties[0].size * propertyData.purchasePrice * ((propertyData.assumptions.personalLoan1Share || 0) / 100)) : 
-          'Enter property size and price'}
-      </div>
-    </div>
-    <div className="col-md-3">
-      <label className="form-label">Personal Loan Rate (%)</label>
-      <input 
-        type="number" 
-        step="0.1"
-        className="form-control"
-        value={propertyData.assumptions.personalLoan1Rate}
-        placeholder="e.g., 11"
-        onChange={(e) => handleAssumptionChange('personalLoan1Rate', e.target.value)}
-      />
-      <small className="text-muted">Example: 11%, 12%, 13%</small>
-    </div>
-    <div className="col-md-3">
-      <label className="form-label">
-        Start Month
-      </label>
-      <input 
-        type="range" 
-        className="form-range"
-        min="0"
-        max="84"
-        value={propertyData.assumptions.personalLoan1StartMonth || 0}
-        onChange={(e) => handleAssumptionChange('personalLoan1StartMonth', e.target.value)}
-      />
-      <div className="d-flex justify-content-between">
-        <small>Month 0</small>
-        <small>84 months</small>
-      </div>
-      <small className="text-muted">Independent of possession</small>
-    </div>
-  </div>
-</div>
+              <h5 className="fw-bold mb-3">
+                <i className="bi bi-cash-coin me-2"></i>
+                Personal Loan 1 Details
+              </h5>
+              <div className="row g-3">
+                <div className="col-md-3">
+                  <label className="form-label">Share of Total Cost (%)</label>
+                  <input 
+                    type="number" 
+                    className="form-control"
+                    value={propertyData.assumptions.personalLoan1Share}
+                    onChange={(e) => handleAssumptionChange('personalLoan1Share', e.target.value)}
+                    disabled={propertyData.paymentPlan !== 'custom'}
+                  />
+                  {propertyData.paymentPlan !== 'custom' && (
+                    <small className="text-muted">Set by payment plan</small>
+                  )}
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">Amount</label>
+                  <div className="form-control bg-light">
+                    {formatCurrency(propertyData.properties[0]?.size * propertyData.purchasePrice * (propertyData.assumptions.personalLoan1Share / 100))}
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">Personal Loan Rate (%)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    className="form-control"
+                    value={propertyData.assumptions.personalLoan1Rate}
+                    onChange={(e) => handleAssumptionChange('personalLoan1Rate', e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">
+                    Start Month (Current: {propertyData.assumptions.personalLoan1StartMonth})
+                    <br />
+                    <small className="text-muted">Independent of possession</small>
+                  </label>
+                  <input 
+                    type="range" 
+                    className="form-range"
+                    min="0"
+                    max="84"
+                    value={propertyData.assumptions.personalLoan1StartMonth}
+                    onChange={(e) => handleAssumptionChange('personalLoan1StartMonth', e.target.value)}
+                  />
+                  <div className="d-flex justify-content-between">
+                    <small>Month 0</small>
+                    <small>84 months</small>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Personal Loan 2 Information */}
             <div className="mb-4">
@@ -1164,62 +1129,58 @@ const PropertyComparison = () => {
 
             {/* Exit Price Scenarios */}
             <div className="mb-4">
-  <h5 className="fw-bold mb-3">
-    <i className="bi bi-graph-up me-2"></i>
-    Exit Price Scenarios
-  </h5>
-  <div className="row g-3 mb-3">
-    <div className="col-md-6">
-      <label className="form-label">Selected Exit Price (₹/sq.ft)</label>
-      <input 
-        type="number" 
-        className="form-control"
-        value={userSelections.selectedExitPrice}
-        placeholder="e.g., 7000"
-        onChange={(e) => handleSelectionUpdate('selectedExitPrice', parseFloat(e.target.value) || '')}
-      />
-      <small className="text-muted">Example: 7000, 8000, 10000</small>
-    </div>
-    <div className="col-md-6">
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <label className="form-label mb-0">Scenario Exit Prices</label>
-        <button 
-          className="btn btn-success btn-sm"
-          onClick={handleAddExitPriceScenario}
-        >
-          <i className="bi bi-plus-circle me-1"></i>
-          Add Scenario
-        </button>
-      </div>
-      <div className="row g-2">
-        {userSelections.scenarioExitPrices.map((price, index) => (
-          <div key={index} className="col-12">
-            <div className="input-group input-group-sm mb-2">
-              <span className="input-group-text">Scenario {index + 1}</span>
-              <input 
-                type="number" 
-                className="form-control"
-                value={price}
-                placeholder="e.g., 8000"
-                onChange={(e) => handleUpdateExitPriceScenario(index, e.target.value)}
-              />
-              {userSelections.scenarioExitPrices.length > 1 && (
-                <button 
-                  className="btn btn-outline-danger"
-                  type="button"
-                  onClick={() => handleRemoveExitPriceScenario(index)}
-                >
-                  <i className="bi bi-trash"></i>
-                </button>
-              )}
+              <h5 className="fw-bold mb-3">
+                <i className="bi bi-graph-up me-2"></i>
+                Exit Price Scenarios
+              </h5>
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label">Selected Exit Price (₹/sq.ft)</label>
+                  <input 
+                    type="number" 
+                    className="form-control"
+                    value={userSelections.selectedExitPrice}
+                    onChange={(e) => handleSelectionUpdate('selectedExitPrice', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <label className="form-label mb-0">Scenario Exit Prices</label>
+                    <button 
+                      className="btn btn-success btn-sm"
+                      onClick={handleAddExitPriceScenario}
+                    >
+                      <i className="bi bi-plus-circle me-1"></i>
+                      Add Scenario
+                    </button>
+                  </div>
+                  <div className="row g-2">
+                    {userSelections.scenarioExitPrices.map((price, index) => (
+                      <div key={index} className="col-12">
+                        <div className="input-group input-group-sm mb-2">
+                          <span className="input-group-text">Scenario {index + 1}</span>
+                          <input 
+                            type="number" 
+                            className="form-control"
+                            value={price}
+                            onChange={(e) => handleUpdateExitPriceScenario(index, e.target.value)}
+                          />
+                          {userSelections.scenarioExitPrices.length > 1 && (
+                            <button 
+                              className="btn btn-outline-danger"
+                              type="button"
+                              onClick={() => handleRemoveExitPriceScenario(index)}
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <small className="text-muted">Add multiple exit prices for comparison</small>
-    </div>
-  </div>
-</div>
 
             {/* Action Button */}
             <div className="text-center mt-5 pt-3">
@@ -2347,7 +2308,8 @@ const PropertyComparison = () => {
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
+
             {/* Tab Content */}
             {renderTabContent()}
 
